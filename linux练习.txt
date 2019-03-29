@@ -1,0 +1,259 @@
+基本命令练习:
+1. 将之前所创建的目录和文件全部清理掉
+		
+		rm -rf  wangwei   递归删除wangwei目录及目录下所有文件，且忽略提示
+2. 在家目录下创建 ~/workspace/cmd 目录以及 ~/workspace/tmp/test 目录（什么是家目录？）
+
+		家目录：存放个人数据的目录，即用户目录     echo $HOME  查看家目录
+		
+		mkdir   -p ~/workspace/cmd         mkdir -p  ~/workspace/tmp/test
+3. 进入 ~/workspace/cmd 目录，创建一个空文件my.txt
+		
+		cd  ~/workspace/cmd
+		touch my.txt
+4. 使用重定向>>与echo命令向my.txt文件写入 hello world 数据
+			
+			echo "hello word" >> my.txt
+5. 将my.txt复制一份到~/workspace/tmp/test目录下
+	
+		cp my.txt ~/workspace/tmp/test
+	
+6. 将~/workspace/tmp/test目录移动剪切到~/workspace/下
+		
+		mv ~/workspace/tmp/test ~/workspace/
+7. 清空~/workspace/下的空目录
+	
+		mkdir -pf  ~/workspace/   递归清空~/workspace/内目录下所有空目录，且忽略提示
+	
+8. 刷新~/workspace/cmd/my.txt文件的时间属性与家目录时间相同
+
+		touch -r ~/workspace/cmd/my.txt ~
+		ls -l ~/workspace/cmd/my.txt
+9. 打印~/workspace/cmd/my.txt文件全部内容到终端显示上
+		
+		cat -n ~/workspace/cmd/my.txt
+10. 分页显示/etc/passwd的内容到显示终端上
+
+		more /etc/passwd 
+11. 在分页显示的内容中匹配root字符
+		
+		less /etc/passwd 
+		?root 
+		q退出
+12. 显示/etc/passwd文件的前五行数据
+			
+			head -5 /etc/passwd
+13. 显示/etc/passwd文件的后五行数据
+
+		tail -5 /etc/passwd
+14. 动态打印显示~/workspace/cmd/my.txt的最后一行数据
+
+		tail -f ~/workspace/cmd/my.txt
+15. 显示/etc/passwd文件中包含Root字符串的行，并显示行号忽略大小写
+
+		grep -i -n “Root” /etc/passwd
+16. 查找~/workspace/目录下名字包含my字符串的文件
+
+		find ~/wokespace/ -name “my*”
+17. 查找~/workspace/目录下最后一次修改时间在10分钟以内的文件
+
+		find ~/workspace/ -cmin -10 
+18. 显示系统时间的时间戳，日历
+
+		date +%s 
+	![在这里插入图片描述](https://img-blog.csdnimg.cn/20190329145605333.png)
+	
+		cal -y 显示全年日历
+19. 以“月-日 时:分”格式显示当前系统时间
+		
+		date +'%m-%d %H:%M'      // 03-29 15:01
+
+		
+20. 修改文件~/workspace/cmd/my.txt的权限为651（代表什么权限？）	
+	
+		chmod 651 my.txt rw-r-x–x      
+		651：文件所有者可读可写、文件所属组可执行、其他用户可执行
+补充：文件权限对用户的分类 ：文件所有者、文件所属组、其他用户
+	用户对文件操作的分类：可读、可写、可执行
+	二进制、八进制表示：有权限1，无权限0
+	umask    查看、设置文件默认权限掩码：设置文件默认的创建权限
+	实际权限：给定权限&（-权限掩码）；
+	例子：        给定 635   掩码 033  求权限
+	实际权限=635 & （-033）
+	设置文件权限：chmod 
+		
+22. 如何使系统默认创建文件的权限为666？ 记得修改回来
+		
+		umask 111
+		umask 002
+23. 修改~/workspace/tmp/目录的权限为其他用户可以进入但是不能查看其中内容也不能在其中创建文件
+
+		mkdir ~/workspace/tmp/ 
+		chmod 751 tmp
+24. 修改~/workspace/cmd/目录权限为可以浏览或进入或创建文件，但是不能删除别人的文件
+
+		chmod +t ~/workspace/cmd/
+25. 打印/etc/passwd文件的第五行数据
+		
+		head -5 /etc/passwd | tail -1 /etc/passwd
+27. 熟练使用tab键的自动补全功能
+		
+		tou+Tab  touch   // 自动补全 
+
+-常用命令所需权限：
+
+			进入目录需要权限  x
+			cd  切换路径   所需权限：x
+			touch 创建文件 所需权限：wx
+			ls   查看文件    所需权限：rx
+			rm  删除文件  所需权限：wx
+			mv  移动文件 所需权限：wx
+
+- 
+- Linux下重要目录/proc, /sys, /SElinux, /bin, /usr/lib, /usr/local, /var, /tmp 的含义及功能：
+
+			1.目录/proc
+		/proc是系统内核提供的文件系统（也是伪文件系统），它放置的数据都是内核中的信			息，例如：系统核心，行程信息，周边装置的状态以网络状态等等。而这些数据都是动态存	放在内存中的，所以用户读取proc文件时，这个文件从动态内存中取出信息并提交。所以/proc目录存在于内存中，不占中硬盘空间。
+		/proc下有三个很重要的目录：net，scsi和sys
+
+		2.目录/sys
+		看过资料后，我的理解是，/sys目录帮/proc目录减轻负担，因为一些/proc目录下的文件读写格式不一样，在转化过程中很麻烦，而/sys目录只有一个值可写或者可读，可以帮/proc记录一些文件的操作，当下一次再调用时，尽量会使用/sys中的值进行操作，而将proc保留给纯净的“进程文件系统”。
+
+		3./SElinux
+		这个文件类似一个保护系统，将用户访问文件的资源进行限制，当有非法操作进行访问时，进行保护。
+
+		4./bin
+		是二进制执行文件目录，主要用于具体运用。
+
+		5./usr/lib
+		存放一些程序运行时所必须的函数库。
+		/lib是内核级的,/usr/lib是系统级的,/usr/local/lib是用户级的.
+
+		6. /usr/local
+		提供给普通用户的/usr目录，/usr/local 这里适合安装软件，存放软件升级包。这里主要存放那些手动安装的软件，即 不是通过“新立得”或apt-get安装的软件 。 它和/usr目录具有相类似的目录结构 ，方便管理
+
+		7. /var
+		如果/usr是系统安装时会占用较大磁盘空间的文件，那么/var就是当系统运行以后会占用较大空间的文件，一些经常被修改的文件，还有一些数据库如MySQL则在/var/lib下，还有，用户未读的邮件的默认存放地点为/var/spool/mail。
+
+		8./tmp
+		一般用户或正在执行的程序临时存放文件的目录,任何人都可以访问,重要数据不可放置在此目录下
+
+-Linux以下重要命令. du, df, top, free, pstack, su, sudo(sudo -, sudo -s), adduser, password的作用：
+
+	1.du命令:[选项]文件
+
+	该命令是显示指定文件以及下的所有文件占用系统数据块的情况，如果没有文件，默认是当前目录
+
+       -a   显示所有文件对系统数据块的使用情况
+
+       -b   显示数据块大小时以字节为基本单位
+
+       -c   除了显示文件对系统数据块的使用情况外还显示出文件的总和
+
+       -s   只显示文件数据块总大小，不显示文件名
+
+       -x   只显示当前目录，但不统计子目录
+
+
+              
+
+	2.df命令：[选项]文件名
+
+     该命令与du命令相似，只不过df计算的是当前文件所有数据块的使用情况（包括前不久删除的文件），而du只是计算当前存在的所有文件的数据块的使用情况
+
+      -a  递归显示各文件及其子目录的数据块利用
+
+      -h  方便阅读时显示
+
+      -H  和-h一样，只不过1k=1000；而不是1024
+
+      -i   显示inode信息
+
+      -k  区块为1024字节
+
+      -T  文件系统类型
+
+
+
+    
+
+	3.top命令：相当于windows下的资源管理器，可以查看当前cpu的使用情况，各进程的状况
+
+	其他选项:
+
+          -b   批处理
+
+          -i    忽略过失
+
+          -c    显示完整的治命令
+
+          -s    保密模式
+
+
+
+	4.free命令：显示所有内存利用率。包括实体内存，虚拟的交换文件内存，共享内存区段，以及系统使用的缓存区等。
+
+	其他选项:
+
+     -b   以byte为单位显示
+
+    -k    以KB为单位显示
+
+     -m  以MB 为单位显示
+
+     - o  不显示缓存区
+
+     -t    测试内存总和列
+
+	
+	5.pstack命令;进程跟踪
+
+	6.su 命令：切换用户（从普通用户到root需要密码，有root到普通用户不用密码）
+
+
+
+
+
+	6.password：用来修改用户密码，root用户可以修改任何用户的密码，但普通用户只能修改自身密码
+
+	7.useradd：添加用户（在root下执行） 
+
+vim练习：
+	
+	1. 模式切换：
+		普通模式-》插入模式
+			i I a A o O s
+			
+		插入模式-》普通模式
+			esc
+		普通模式-》底行模式
+			：
+	2. 普通模式下的操作：
+		dd 3dd	按行删除
+		yy 3yy	按行复制
+		p	粘贴
+		dw	删除单词
+		x	删除字符
+		D	删除光标后的数据
+		u	撤销操作
+		ctrl+r	反向撤销
+		r	字符替换
+		R	连续替换
+		gg=G	全文对齐
+		hjkl	移动光标
+		w	光标向后移动一个单词
+		b	光标向前移动一个单词
+		ctrl+f	向下翻页
+		ctrl+b	向上翻页
+	2. 底行模式的操作：
+		:w	保存
+		:q	退出
+		:q!	强制退出，退出不保存
+		:wq	保存并退出
+		:!ls	执行命令
+Linux下使用命令安装gcc/g++, gdb, vim 
+
+	yum install gcc   // 编译器 
+	yum install gdb  // 调试器
+	yum install vim  // 编辑工具
+	yum install git  // 版本控制工具

@@ -1,24 +1,45 @@
-#include <unistd.h>
+/**********************************************************
+ * Author        : WangWei
+ * Email         : 872408568@qq.com
+ * Last modified : 2019-05-05 20:38
+ * Filename      : IO_1.c
+ * Description   : 标准IO函数的实现
+ * fopen 、fclose   打开、关闭指定文件
+ *
+ * *******************************************************/
 #include <stdio.h>
-#include <sys/stat.h>   // open函数头文件
-#include <sys/types.h>
-#include <fcntl.h>
-
-// 文件IO的open 与close 的使用
-// open函数用来打开一个指定的文件并获得文件描述符，或者创建一个新文件  
-// int open(const char *pathname, int flags);
-// int open(const char *pathname, int flags, mode_t mode)
-//
-//close函数关闭文件并释放相应资源
-// int close (int fd);
+#include <stdlib.h>
+#include <errno.h>
+#include <sys/ioctl.h>
+#include <strings.h>
 
 int main()
 {
-    // 打开文件1.txt 不存在则创建
-    int fd = open("1.txt",O_CREAT | O_TRUNC | O_WRONLY, 0644);
-    printf("fd: %d \n",fd);
+    FILE *fp = fopen("1.txt", "w+");    // FILE *fopen(const char *path, const char *mode);   指定文件  打开方式
+
+    //文件打开失败，则fopen()返回NULL
+    if(fp == NULL)  {
+
+        perror("fopen error");
+        exit(1);
+    }
+
+    char *buf[1024];
+    FILE *fp_src = fp;
+
+    bzero(buf, 1024);
+     fwrite(buf,1024,12,fp_src);
+
+     fread(buf,1024,12,fp_src);
+
+
+    // 文件关闭失败，则fclose()返回EOF
+    if(fclose(fp) == EOF) {
+        perror("fclose error");
+        exit(1);
+    }
+
     
-    close(fd);      // 文件使用完毕后必须关闭，这点与malloc 函数相似
     return 0;
 }
 

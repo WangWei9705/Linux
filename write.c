@@ -1,29 +1,37 @@
 /**********************************************************
  * Author        : WangWei
  * Email         : 872408568@qq.com
- * Last modified : 2019-06-22 21:34:36
+ * Last modified : 2019-06-22 22:05:20
  * Filename      : write.c
- * Description   : 标准IO接口——写
+ * Description   : 系统IO接口——写 
  * *******************************************************/
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <string.h>
+#include <unistd.h>
+
 
 int main()
 {
-    FILE* fp = fopen("Linux.txtx", "w");
-    if(!fp) {
-        printf("fopen error!\n");
+    umask(0);   // 设置默认权限
+    int fd = open("test.txt", O_WRONLY | O_CREAT, 0644);
+    if(fd < 0) {
+        perror("open");
+        return -1;
     }
 
-    const char* msg = "你好!\n";
     int count = 10;
+    const char *msg = "你好呀！\n";
+    int len = strlen(msg);
 
     while(count--) {
-        fwrite(msg, strlen(msg), 1, fp);
+        write(fd, msg, len);
     }
-
-    fclose(fp);
+    close(fd);
+    printf("Hello world\n");
     return 0;
 }
 

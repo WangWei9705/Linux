@@ -1,0 +1,133 @@
+
+单表查询
+
+查询工资高于500或岗位为MANAGER的雇员，同时还要满足他们的姓名首字母为大写的J
+select sal, job from emp
+where sal > 500 
+or job = 'MANAGER'
+and ename like '%J';
+
+按照部门号升序而雇员的工资降序排序
+select * from emp order by deptno, sal desc;
+
+使用年薪进行降序排序
+select ename, sal*1+ifnull(comm,0) as "年薪" from emp order by "年薪";
+
+显示工资最高的员工的名字和工作岗位
+select ename, job from emp where sal = (select max(sal) from emp);
+
+显示工资高于平均工资的员工信息
+select *from emp where sal > (select avg(sal) from emp);
+
+显示每个部门的平均工资和最高工资
+select deptno, avg(sal), max(sal) from emp group by deptno;
+
+显示平均工资低于2000的部门号和它的平均工资
+
+select deptno, avg(sal) from emp having avg(sal) < 2000;
+
+显示每种岗位的雇员总数，平均工资
+
+select job, count(*) '总数', avg(sal) from emp group by job;
+
+总结：出现"每"字样时需要进行分组  属于多行查询
+
+多表查询
+显示雇员名、雇员工资以及所在部门的名字因为上面的数据来自EMP和DEPT表
+
+
+
+列出部门名称和这些部门的员工信息，同时列出没有员工的部门
+select * from dept left join emp on dept.deptno = emp.deptno;    左连
+select dname, ename from emp right join dept on emp.deptno = dept.deptno;       右连	
+
+
+索引：提高检索速度，以空间换时间
+索引的建立
+	主键索引、唯一键索引建立：
+		1、直接在声明字段时建立
+		2、在语句末尾建立
+		3、表建完后使用alter table 表名 add 建立
+		
+	主键、唯一键特点对比：
+	1、一个表只能有一个主键（可符合），可以有多个唯一键
+	2、查询效率高
+	3、创建主键索引的列的值不能为null，且不能重复；创建唯一键索引的列的值不能重复；如果唯一键值设置为not null 自动转化为主键
+	4、主键索引基本都是int类型
+		
+	普通索引的建立：
+		1、在定义表语句末尾 index(需要建立索引的字段);
+		2、使用alter table 表名 add index(需要建立索引的字段);
+		3、	create index index_name on 表名(需要建立索引的字段);
+		
+	普通索引一个表中可以拥有多个，如果某列需要建立索引时存在重复值，则需要使用普通索引
+		
+	查看索引：
+		1、show keys from  表名
+		2、show index from 表名
+		3、desc 表名
+		
+	全文索引（MYISAM引擎支持全文索引）
+	
+	删除索引：
+		1、alter table 表名 drop primary key;
+		2、alter table 表名 drop index index_name;
+		3、drop index index_name on 表名；
+		
+	注意事项：
+		1、需要频繁作为查询条件的字段（非唯一性太差字段）需要创建索引
+		2、更新频繁的字段不适合创建索引
+		3、不会出现在where句子中的字段不该创建索引
+		
+事务（innoDB支持，MYISAM不支持）
+	概念：一组DML语句，这些语句在逻辑上存在相关性，这些语句要么全部执行，要么全部不执行。
+	事务的基本操作：
+		事务的开始：start transaction;
+		创建保存点：savepoint 保存点名;   便于修改提交语句
+		回到保存点：rollback to 保存点名;   若未设置保存点则直接回到事务的开始处
+		提交事务: commit transaction;   事务一旦提交就不能回退了
+		
+	事务的隔离
+		无隔离性可能会导致：数据脏读、不可重复读、幻读等问题
+		幻读与不可重复读的区别在于：不可重复读重点是修改，幻读重点是数据的新增或删除
+		
+		隔离级别：读未提交、读已提交（不存在脏读）、可重复读（不存在任何问题）、可串行化（加锁，不存在任何问题）
+		
+		设置事务隔离级别：set session transaction isolation level 事务隔离级别名称；
+		查看事务隔离界别：select @@tx_isolation;
+		
+	事务的ACID特性：
+	A:原子性
+	C:一致性
+	I：隔离性
+	D:持久性
+
+
+视图（相当于真实表的某个查询语句查询到的结果表，会互相影响）
+	1、视图的创建：create view view_name as select 语句
+	2、视图的使用：select * from view_name；
+	3、视图的修改：update
+	4、视图的删除：drop view_name;
+	
+	注意事项：
+	1、与表一样，命名必须唯一
+	2、创建视图数目无限制，但是需要考虑查询复杂度对视图的影响
+	3、视图不能添加索引，也不能有关联的触发器或者默认值
+	4、视图可以提高安全性，必须有足够的访问权限
+	5、视图中可以使用order by 但是如果创建视图的select 语句中也有order by则视图中的order by 将被覆盖
+	6、视图和表可以同时使用；
+
+
+用户管理：
+	创建用户：create user 'username'@'主机名/ip' identified by 'password';
+	删除用户：drop user 'user'@'主机名';
+	修改用户密码：
+		1、给自己修改：set password = password('new password');
+		2、root用户修改指定用户密码：set password for 'username'@'主机名' = password('new password');
+		3、赋权限时修改:
+	
+	给用户授权：grant 权限列表 on 库.对象名 to 'username'@'ip' [identified by 'password'];
+		权限列表中多个权限需要用逗号隔开
+	刷新权限：flush privleges;
+	回收权限：revoke 权限列表 on 库.对象名 from 'username'@'ip';
+		
